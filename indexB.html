@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <meta name="theme-color" content="#ff7ac6" />
+  <title>🎉 Happy Birthday!</title>
+  
+  <!-- Optional: Google Font (works online; safe to remove if fully offline) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg: #0f1226;
+      --bg-2: #181b35;
+      --accent: #ff7ac6;
+      --accent-2: #7aafff;
+      --ink: #ffffff;
+      --muted: #cdd3ff;
+      --success: #60d394;
+      --shadow: 0 10px 30px rgba(0,0,0,.25);
+    }
+    *{ box-sizing: border-box; }
+    html,body{ height:100%; margin:0; background: radial-gradient(1200px 800px at 80% -10%, #1c1f47 0%, #0b0d1f 60%, #090b17 100%); color:var(--ink); font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
+
+    .wrap{ min-height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px; gap:18px; }
+
+    /* Envelope Intro */
+    .card-intro{ width:100%; max-width:540px; display:flex; flex-direction:column; align-items:center; gap:14px; text-align:center; }
+    .envelope{ width:250px; height:180px; position:relative; cursor:pointer; transform-style:preserve-3d; transition: transform .6s ease; }
+    .envelope .base{ position:absolute; inset:0; background:linear-gradient(145deg, var(--accent) 0%, #ffb8e5 100%); border-radius:18px; box-shadow:var(--shadow); }
+    .envelope .flap{ position:absolute; top:0; left:0; right:0; height:50%; background:linear-gradient(145deg, #ffe6f6 0%, #ffd1ef 100%); clip-path: polygon(0 0, 100% 0, 50% 100%); border-top-left-radius:18px; border-top-right-radius:18px; transform-origin:50% 0; transition: transform .7s cubic-bezier(.2,.8,.2,1); }
+    .envelope.open .flap{ transform: rotateX(180deg); }
+    .tap-hint{ font-size:14px; color:var(--muted); }
+
+    /* Main Card */
+    .card{ width:100%; max-width:720px; background:linear-gradient(180deg, rgba(122,175,255,.15), rgba(255,122,198,.10)); border:1px solid rgba(255,255,255,.12); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius:28px; padding:22px; box-shadow: var(--shadow); display:none; }
+    .card.open{ display:block; animation: pop .5s ease both; }
+    @keyframes pop{ from{ transform:scale(.96); opacity:0 } to{ transform:scale(1); opacity:1 } }
+
+    .header{ display:flex; align-items:center; gap:14px; }
+    .pfp{ width:60px; height:60px; border-radius:50%; background:#22284a center/cover no-repeat; border:2px solid rgba(255,255,255,.25); box-shadow: var(--shadow); flex:0 0 60px; }
+    .title{ line-height:1.1; }
+    .title h1{ margin:0; font-size:28px; font-weight:800; letter-spacing:.3px; }
+    .title p{ margin:4px 0 0; font-size:14px; color:var(--muted); }
+
+    /* Balloons */
+    .balloons{ position:relative; height:120px; margin:6px 0 2px; overflow:hidden; }
+    .balloon{ position:absolute; bottom:-140px; width:30px; height:40px; border-radius:50% 50% 45% 55%/55% 45% 55% 45%; background:var(--accent); box-shadow: inset 0 -10px 20px rgba(0,0,0,.15); animation: floatUp linear infinite; }
+    .balloon::after{ content:''; position:absolute; left:50%; transform:translateX(-50%); bottom:-45px; width:2px; height:50px; background:rgba(255,255,255,.4); }
+    @keyframes floatUp{ to{ transform: translateY(-240px); } }
+
+    /* Message */
+    .msg{ font-size:16px; line-height:1.7; color:#e9ecff; margin:8px 2px 0; }
+    .msg em{ color:#ffe28a; font-style:normal; font-weight:600; }
+    .typewriter{ border-right:2px solid rgba(255,255,255,.5); white-space:nowrap; overflow:hidden; display:inline-block; }
+
+    /* Gallery */
+    .gallery{ margin:16px 0 10px; position:relative; border-radius:20px; overflow:hidden; border:1px solid rgba(255,255,255,.15); }
+    .slides{ display:flex; width:100%; aspect-ratio: 16 / 9; transform: translateX(0); transition: transform .5s ease; }
+    .slides img{ min-width:100%; object-fit:cover; }
+    .nav{ display:flex; justify-content:center; gap:10px; margin-top:10px; }
+    .dot{ width:10px; height:10px; border-radius:50%; background:rgba(255,255,255,.35); border:none; }
+    .dot.active{ background:#fff; }
+
+    /* Surprise */
+    .cta{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:center; margin:14px 0 6px; }
+    button.btn{ appearance:none; border:none; background:linear-gradient(145deg, var(--accent) 0%, #ffa5da 100%); color:#0b0d1f; font-weight:800; padding:12px 18px; border-radius:16px; box-shadow: var(--shadow); font-size:16px; cursor:pointer; }
+    button.btn:active{ transform: translateY(1px); }
+    .hint{ font-size:12px; color:var(--muted); }
+
+    /* Custom Message Popup */
+    .popup-overlay{ 
+      position:fixed; 
+      top:0; left:0; right:0; bottom:0; 
+      background:rgba(0,0,0,0.8); 
+      backdrop-filter: blur(5px);
+      display:none; 
+      align-items:center; 
+      justify-content:center; 
+      z-index:1000;
+      padding:20px;
+      animation: fadeIn 0.3s ease;
+    }
+    .popup-overlay.active{ display:flex; }
+    
+    .popup-box{ 
+      background:linear-gradient(145deg, rgba(255,122,198,0.9) 0%, rgba(122,175,255,0.9) 100%);
+      border:2px solid rgba(255,255,255,0.3);
+      backdrop-filter: blur(15px);
+      border-radius:24px; 
+      padding:30px; 
+      max-width:500px; 
+      width:100%;
+      text-align:center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+      position:relative;
+      transform: scale(0.8);
+      animation: popIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    @keyframes popIn {
+      to { transform: scale(1); }
+    }
+    
+    .popup-box h2{
+      margin:0 0 20px;
+      font-size:24px;
+      font-weight:800;
+      color:#0b0d1f;
+      text-shadow: 1px 1px 2px rgba(255,255,255,0.5);
+    }
+    
+    .popup-box p{
+      margin:0 0 25px;
+      font-size:16px;
+      line-height:1.6;
+      color:#0b0d1f;
+      font-weight:500;
+    }
+    
+    .popup-box em{
+      color:#ff1a75;
+      font-style:normal;
+      font-weight:800;
+    }
+    
+    .close-btn{
+      background:linear-gradient(145deg, #0b0d1f 0%, #1a1d3a 100%);
+      color:#fff;
+      border:none;
+      padding:12px 24px;
+      border-radius:12px;
+      font-weight:600;
+      cursor:pointer;
+      font-size:14px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      transition: all 0.2s ease;
+    }
+    
+    .close-btn:hover{
+      transform: translateY(-1px);
+      box-shadow: 0 7px 20px rgba(0,0,0,0.4);
+    }
+    
+    /* Voice Message Popup */
+    .voice-popup{
+      background:linear-gradient(145deg, rgba(122,175,255,0.95) 0%, rgba(255,122,198,0.95) 100%);
+      border:2px solid rgba(255,255,255,0.3);
+      backdrop-filter: blur(15px);
+      border-radius:24px;
+      padding:25px;
+      max-width:450px;
+      width:100%;
+      text-align:center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+      transform: scale(0.8);
+      animation: popIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+    }
+
+    .voice-popup h3{
+      margin:0 0 20px;
+      font-size:20px;
+      font-weight:800;
+      color:#0b0d1f;
+    }
+
+    /* Audio Player in Popup */
+    .popup-audio-player{
+      width: 100%;
+      margin: 20px 0;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.1);
+      padding: 10px;
+    }
+
+    .popup-audio-player audio{
+      width: 100%;
+      height: 40px;
+      border-radius: 8px;
+    }
+
+    .voice-controls{
+      display:flex;
+      gap:10px;
+      justify-content:center;
+      align-items:center;
+      margin:20px 0;
+      flex-wrap:wrap;
+    }
+
+    .voice-btn{
+      background:linear-gradient(145deg, #0b0d1f 0%, #1a1d3a 100%);
+      color:#fff;
+      border:none;
+      padding:10px 16px;
+      border-radius:12px;
+      font-weight:600;
+      cursor:pointer;
+      font-size:14px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      transition: all 0.2s ease;
+      display:flex;
+      align-items:center;
+      gap:5px;
+    }
+
+    .voice-btn:hover{
+      transform: translateY(-1px);
+      box-shadow: 0 7px 20px rgba(0,0,0,0.4);
+    }
+
+    .voice-btn:disabled{
+      opacity:0.6;
+      cursor:not-allowed;
+    }
+
+    .waveform{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:3px;
+      margin:15px 0;
+      height:40px;
+    }
+
+    .wave-bar{
+      width:4px;
+      background:linear-gradient(to top, #ff7ac6, #7aafff);
+      border-radius:2px;
+      animation:wave 1.5s ease-in-out infinite;
+    }
+
+    .wave-bar:nth-child(2n){animation-delay:0.2s;}
+    .wave-bar:nth-child(3n){animation-delay:0.4s;}
+    .wave-bar:nth-child(4n){animation-delay:0.6s;}
+
+    @keyframes wave{
+      0%, 100%{height:10px;}
+      50%{height:30px;}
+    }
+
+    .voice-status{
+      font-size:14px;
+      color:#0b0d1f;
+      margin:10px 0;
+      font-weight:600;
+    }
+
+    /* Confetti (emoji rain) */
+    .confetti{ pointer-events:none; position:fixed; inset:0; overflow:hidden; z-index:999; display:none; }
+    .confetti.active{ display:block; }
+
+    /* Footer */
+    .footer{ text-align:center; font-size:12px; color:var(--muted); margin-top:8px; }
+
+    /* Small devices tweaks */
+    @media (max-width: 420px){
+      .title h1{ font-size:24px; }
+      .pfp{ width:52px; height:52px; }
+      .popup-box{ padding:25px; margin:10px; }
+      .popup-box h2{ font-size:20px; }
+      .popup-box p{ font-size:15px; }
+      .voice-popup{ max-width:350px; padding:20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- Intro Envelope -->
+    <div class="card-intro">
+      <div class="envelope" id="envelope" aria-label="Open birthday card" role="button" tabindex="0">
+        <div class="base"></div>
+        <div class="flap"></div>
+      </div>
+      <div class="tap-hint">Tap the envelope to open 🎀</div>
+    </div>
+
+    <!-- Main Card -->
+    <article class="card" id="card">
+      <header class="header">
+        <!-- Replace pfp.jpg with your friend's photo (square works best) -->
+        <div class="pfp" id="pfp" style="background-image:url('picj1.jpeg');"></div>
+        <div class="title">
+          <!-- Edit the name here -->
+          <h1>Happy Birthday, <span id="sudu">Bestie 💛</span>!</h1>
+          <p id="subtitle">Wishing you the most magical year ahead ✨</p>
+        </div>
+      </header>
+
+      <!-- Floating balloons (auto generated) -->
+      <div class="balloons" id="balloons" aria-hidden="true"></div>
+
+      <!-- Message (edit the text in data-message below) -->
+      <p class="msg"><span class="typewriter" id="tw" data-message="You make every day brighter. Today is all about <em>you</em> — laughter, cake, and unforgettable memories. Thank you for being my favorite human!"> </span></p>
+
+      <!-- Photo gallery: replace image URLs -->
+      <section class="gallery">
+        <div class="slides" id="slides">
+          <img src="picj8.jpeg" alt="Memory 1" />
+        </div>
+      </section>
+      <div class="nav" id="nav"></div>
+
+      <!-- Surprise buttons -->
+      <div class="cta">
+        <button class="btn" id="btnSurprise">Tap for a surprise 🎉</button>
+        <button class="btn" id="btnWish">Play my wish 💌</button>
+      </div>
+      <div class="hint">Tip: You can add this card to your Home Screen for a full‑screen look.</div>
+
+      <footer class="footer">Made with ❤️ just for you • <span id="year"></span></footer>
+    </article>
+  </div>
+
+  <!-- Custom Message Popup -->
+  <div class="popup-overlay" id="popupOverlay">
+    <div class="popup-box">
+      <h2>🎊 Special Message for You! 🎊</h2>
+      <p id="customMessage">
+        Hey beautiful! 🌟 I'm so incredibly lucky to have you in my life. You bring <em>joy</em>, <em>laughter</em>, and <em>endless happiness</em> wherever you go. 
+        <br><br>
+        On your special day, I want you to know how much you mean to me. You're not just my friend, you're my <em>chosen family</em>! 
+        <br><br>
+        May this new year of life be filled with adventures, dreams coming true, and all the cake you can eat! 🎂✨
+        <br><br>
+        <em>Happy Birthday, my amazing friend! 💖</em>
+      </p>
+      <button class="close-btn" id="closePopup">Close 💕</button>
+    </div>
+  </div>
+
+  <!-- Voice Message Popup -->
+  <div class="popup-overlay" id="voicePopupOverlay">
+    <div class="voice-popup">
+      <h3>💌 My Personal Wish for You</h3>
+      
+      <!-- Audio Player inside the popup -->
+      <div class="popup-audio-player">
+        <audio id="popupAudio" controls preload="metadata">
+          <source src="voice_message.mp3.mp3" type="audio/mpeg">
+          
+          Your browser does not support the audio element.
+        </audio>
+      </div>
+
+      <!-- Alternative Voice Controls (if you prefer custom controls) -->
+      <div class="voice-controls" style="display: none;" id="customControls">
+        <button class="voice-btn" id="playVoiceBtn">
+          <span id="playIcon">▶️</span> <span id="playText">Play</span>
+        </button>
+        <button class="voice-btn" id="pauseVoiceBtn" disabled>
+          ⏸️ Pause
+        </button>
+        <button class="voice-btn" id="stopVoiceBtn" disabled>
+          ⏹️ Stop
+        </button>
+      </div>
+
+      <!-- Audio Wave Animation -->
+      <div class="waveform" id="waveform" style="display:none;">
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+      </div>
+
+      <div class="voice-status" id="voiceStatus">🎵 Use the audio player above to hear my message! 💕</div>
+      
+      <button class="close-btn" id="closeVoicePopup">Close</button>
+    </div>
+  </div>
+
+  <!-- Confetti layer -->
+  <div class="confetti" id="confetti"></div>
+
+  <!-- Hidden audio for JavaScript control (if needed) -->
+  <audio id="hiddenAudio" preload="metadata" style="display: none;">
+    <source src="voice_message.mp3.mp3" type="audio/mpeg">
+    
+  </audio>
+
+  <script>
+    // ===== Helper: qs =====
+    const qs = (sel, el=document) => el.querySelector(sel);
+    const qsa = (sel, el=document) => [...el.querySelectorAll(sel)];
+
+    // ===== Envelope open -> show card =====
+    const envelope = qs('#envelope');
+    const card = qs('#card');
+    const friendNameEl = qs('#friendName');
+
+    const openCard = () => {
+      envelope.classList.add('open');
+      setTimeout(()=>{
+        card.classList.add('open');
+        // small haptic on supported mobiles
+        if (window.navigator && 'vibrate' in navigator) navigator.vibrate(10);
+      }, 500);
+      // hide intro after open
+      setTimeout(()=>{
+        envelope.parentElement.style.display = 'none';
+      }, 900);
+    };
+
+    ['click','keydown'].forEach(evt=>{
+      envelope.addEventListener(evt, e=>{
+        if(evt==='keydown' && e.key!=='Enter' && e.key!==' '){ return; }
+        openCard();
+      });
+    });
+
+    // ===== Balloons =====
+    const balloons = qs('#balloons');
+    const COLORS = ['#ff7ac6','#7aafff','#ffe28a','#60d394','#c792ea'];
+    for(let i=0;i<10;i++){
+      const b=document.createElement('div');
+      b.className='balloon';
+      const left = Math.random()*100; // percent
+      const delay = Math.random()*4; // seconds
+      const dur = 6+Math.random()*6; // seconds
+      b.style.left=left+'%';
+      b.style.background=COLORS[i%COLORS.length];
+      b.style.animationDuration = dur+'s';
+      b.style.animationDelay = delay+'s';
+      balloons.appendChild(b);
+    }
+
+    // ===== Typewriter =====
+    const tw = qs('#tw');
+    const text = tw.getAttribute('data-message') || '';
+    let i=0;
+    function type(){
+      if(i <= text.length){
+        tw.innerHTML = text.slice(0,i);
+        i++;
+        setTimeout(type, 28);
+      } else { tw.style.borderRight='none'; }
+    }
+
+    // ===== Simple slider =====
+    const slides = qs('#slides');
+    const imgs = qsa('img', slides);
+    const nav = qs('#nav');
+    let index = 0;
+    imgs.forEach((_, idx)=>{
+      const dot=document.createElement('button');
+      dot.className='dot'+(idx===0?' active':'');
+      dot.addEventListener('click',()=>goTo(idx));
+      nav.appendChild(dot);
+    });
+    const dots = qsa('.dot', nav);
+
+    function goTo(n){
+      index = (n+imgs.length)%imgs.length;
+      slides.style.transform = `translateX(-${index*100}%)`;
+      dots.forEach((d,i)=>d.classList.toggle('active', i===index));
+      if (window.navigator && 'vibrate' in navigator) navigator.vibrate(6);
+    }
+
+    // swipe
+    let startX=null; slides.addEventListener('touchstart', e=>{ startX = e.touches[0].clientX; }, {passive:true});
+    slides.addEventListener('touchend', e=>{
+      if(startX===null) return; const endX = e.changedTouches[0].clientX; const dx = endX-startX; if(Math.abs(dx)>30){ goTo(index + (dx<0?1:-1)); } startX=null;
+    });
+
+    // ===== Surprise: Confetti & Custom Popup =====
+    const btnSurprise = qs('#btnSurprise');
+    const confetti = qs('#confetti');
+    const popupOverlay = qs('#popupOverlay');
+    const closePopup = qs('#closePopup');
+    const EMOJIS = ['🎉','🎂','🎈','✨','💖','🥳','🌟','💕','🎊','🌈'];
+
+    function launchConfetti(){
+      confetti.classList.add('active');
+      const total = 100;
+      for(let i=0;i<total;i++){
+        const s = document.createElement('div');
+        s.textContent = EMOJIS[i%EMOJIS.length];
+        s.style.position='absolute';
+        s.style.left = (Math.random()*100)+'%';
+        s.style.top = '-40px';
+        s.style.fontSize = (16 + Math.random()*20) + 'px';
+        s.style.transform = `rotate(${Math.random()*360}deg)`;
+        s.style.opacity = 0.9;
+        s.style.zIndex = '1001';
+        confetti.appendChild(s);
+        const fall = s.animate([
+          { transform: `translateY(0) rotate(0deg)` },
+          { transform: `translateY(${window.innerHeight+80}px) rotate(${180+Math.random()*180}deg)` }
+        ], { duration: 2000 + Math.random()*1500, easing: 'cubic-bezier(.2,.8,.2,1)' });
+        fall.onfinish = ()=> s.remove();
+      }
+      setTimeout(()=> confetti.classList.remove('active'), 3000);
+    }
+
+    // Show custom popup with confetti
+    btnSurprise.addEventListener('click', ()=>{
+      popupOverlay.classList.add('active');
+      launchConfetti();
+      // Vibrate if supported
+      if (window.navigator && 'vibrate' in navigator) navigator.vibrate([100, 50, 100]);
+    });
+
+    // Close popup
+    closePopup.addEventListener('click', ()=>{
+      popupOverlay.classList.remove('active');
+    });
+
+    // Close popup when clicking overlay
+    popupOverlay.addEventListener('click', (e)=>{
+      if(e.target === popupOverlay){
+        popupOverlay.classList.remove('active');
+      }
+    });
+
+    // ===== Voice Message Popup =====
+    const btnWish = qs('#btnWish');
+    const voicePopupOverlay = qs('#voicePopupOverlay');
+    const closeVoicePopup = qs('#closeVoicePopup');
+    const popupAudio = qs('#popupAudio');
+    const voiceStatus = qs('#voiceStatus');
+    const waveform = qs('#waveform');
+
+    // Show voice message popup when "Play my wish" is clicked
+    btnWish.addEventListener('click', ()=>{
+      voicePopupOverlay.classList.add('active');
+      voiceStatus.textContent = '🎵 Use the audio player above to hear my message! 💕';
+    });
+
+    // Close voice popup
+    closeVoicePopup.addEventListener('click', ()=>{
+      voicePopupOverlay.classList.remove('active');
+      if(popupAudio) {
+        popupAudio.pause();
+        popupAudio.currentTime = 0;
+      }
+      waveform.style.display = 'none';
+    });
+
+    // Close when clicking overlay
+    voicePopupOverlay.addEventListener('click', (e)=>{
+      if(e.target === voicePopupOverlay){
+        voicePopupOverlay.classList.remove('active');
+        if(popupAudio) {
+          popupAudio.pause();
+          popupAudio.currentTime = 0;
+        }
+        waveform.style.display = 'none';
+      }
+    });
+
+    // Audio event listeners for the popup audio player
+    if(popupAudio) {
+      popupAudio.addEventListener('play', ()=>{
+        waveform.style.display = 'flex';
+        voiceStatus.textContent = '🎵 Playing my heartfelt message... 💕';
+        // Vibrate if supported
+        if (window.navigator && 'vibrate' in navigator) navigator.vibrate([50, 100, 50]);
+      });
+
+      popupAudio.addEventListener('pause', ()=>{
+        waveform.style.display = 'none';
+        voiceStatus.textContent = '⏸️ Paused - Click play to continue';
+      });
+
+      popupAudio.addEventListener('ended', ()=>{
+        waveform.style.display = 'none';
+        voiceStatus.textContent = '💖 Message finished! Hope you loved it!';
+        // Auto-close after 3 seconds
+        setTimeout(()=>{
+          if(voicePopupOverlay.classList.contains('active')){
+            voicePopupOverlay.classList.remove('active');
+          }
+        }, 3000);
+      });
+
+      popupAudio.addEventListener('error', ()=>{
+        voiceStatus.textContent = '❌ Could not load voice message. Please check your file!';
+        waveform.style.display = 'none';
+      });
+
+      popupAudio.addEventListener('loadstart', ()=>{
+        voiceStatus.textContent = '🔄 Loading your voice message...';
+      });
+
+      popupAudio.addEventListener('canplay', ()=>{
+        voiceStatus.textContent = '🎵 Ready to play! Click the play button above 💕';
+      });
+    }
+
+    // ===== Set year =====
+    qs('#year').textContent = new Date().getFullYear();
+
+    // Start typewriter after card opens
+    const observer = new MutationObserver(()=>{ if(card.classList.contains('open')){ type(); observer.disconnect(); } });
+    observer.observe(card, { attributes:true });
+
+    // ===== Quick customization (optional): edit these values only =====
+    // Subtitle
+    qs('#subtitle').textContent = 'Wishing you the most magical year ahead ✨';
+
+  </script>
+</body>
+</html>
